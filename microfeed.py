@@ -25,6 +25,14 @@ class Microfeed:
     categories = ()
     articles = {}
 
+    def setup_dict(self):
+        """
+        Sets microfeed.articles to contain a key for each category, each holding an
+        empty list.
+        """
+        for cat in self.categories:
+            self.articles[cat] = []
+
 microfeed = Microfeed()
 
 
@@ -32,21 +40,18 @@ def get_categories(pelican):
     """
     Collect the list of categories that the user wants to turn into microfeeds.
     """
-    print('====> GETTING MICROFEED CATEGORIES')
     categories = pelican.settings.get('MICROFEEDS', None)
     if categories and type(categories) in (list, set, tuple):
         microfeed.categories = categories
-        for cat in categories:
-            microfeed.articles[cat] = []
+        microfeed.setup_dict()
 
 def collect_microfeed_articles(article_generator):
     """
     Collect the microfeed articles from the article generator and move them to the
     microfeed object for later use.
     """
-    print('====> COLLECTING MICROFEED ARTICLES')
     if microfeed.categories:
-
+        microfeed.setup_dict()
         normal_articles = []
         for article in article_generator.articles:
             if article.category in microfeed.categories:
@@ -60,7 +65,6 @@ def add_microfeed_to_context(page_generator):
     Expose the microfeed object to the page generator's context for use in page
     templates'
     """
-    print('====> ADDING MICROFEED TO PAGE CONTEXT')
     for cat in microfeed.categories:
         setattr(microfeed, cat, microfeed.articles[cat])
     page_generator.context['microfeed'] = microfeed
@@ -69,7 +73,6 @@ def gen_microfeed_feed(article_generator, writer):
     """
     Optionally generate an ATOM/RSS feed for each microfeed.
     """
-    print('====> GENERATING MICROFEED ATOM/RSS FEED')
     for cat_name in microfeed.categories:
         cat = microfeed.articles[cat_name][0].category
 
@@ -101,6 +104,5 @@ def gen_microfeed_feed(article_generator, writer):
 def register():
     signals.initialized.connect(get_categories)
     signals.article_generator_pretaxonomy.connect(collect_microfeed_articles)
-    #signals.page_generator_context.connect(add_microfeed_to_context)
     signals.page_generator_finalized.connect(add_microfeed_to_context)
     signals.article_writer_finalized.connect(gen_microfeed_feed)
