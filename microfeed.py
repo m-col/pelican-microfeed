@@ -18,6 +18,8 @@ to the main articles. The how and what:
 """
 
 
+from functools import partial
+
 from pelican import signals
 
 
@@ -100,6 +102,14 @@ def gen_microfeed_feed(article_generator, writer):
                 feed_title=cat.name,
                 feed_type='rss'
             )
+    if article_generator.settings.get('GENERATE_MICROFEED_POSTS', False):
+        write = partial(
+            writer.write_file,
+            relative_urls=article_generator.settings['RELATIVE_URLS'],
+        )
+        for cat_name in microfeed.categories:
+            article_generator.articles = microfeed.articles[cat_name]
+            article_generator.generate_articles(write)
 
 def register():
     signals.initialized.connect(get_categories)

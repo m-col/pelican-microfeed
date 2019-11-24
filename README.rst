@@ -1,8 +1,8 @@
 microfeed - Pelican plugin
 ==========================
 
-microfeeds allows for the creation of pages that each act as a feed of content separate
-to the main articles. The how and what:
+microfeeds allows for the creation of pages that each act as a feed of content
+separate to the main articles. The how and what:
 
  - Write articles under a category that will be used to make a microfeed.
  - Create the config setting MICROFEEDS as a list of these categories.
@@ -12,3 +12,7 @@ to the main articles. The how and what:
    as microfeed.*category* or microfeed[*category*] (these are equivalent).
  - Each microfeed will also generate an ATOM/RSS feed as usual if you have set
    CATEGORY_FEED_ATOM or CATEGORY_FEED_RSS.
+ - The GENERATE_MICROFEED_POSTS setting can be set to True to make the
+   microfeed entries still generate individual articles at the very end of
+   generation, still keeping them hidden from all other pages except via the
+   microfeed object.
